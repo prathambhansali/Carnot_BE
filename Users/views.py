@@ -13,9 +13,8 @@ from rest_framework.decorators import (api_view, authentication_classes,
                                        permission_classes)
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
-from Users.UserSerializer import PasswordResetSerializers
 from .models import PasswordReset, UserProfile
-
+from django.db import transaction
 
 def UserCreated(mail_list):
     # sender_email = 'prathmesh@datasee.ai'
@@ -110,7 +109,6 @@ def create(request):
                 myuser = User.objects.get(username=data['username'])
                 myuser.groups.add(mygroup)
                 profile.save()
-                # AccountCreated(['prathmesh@datasee.ai'], data)
                 # AccountCreated(['sanjay@datasee.ai', 'afzal@datasee.ai', 'adhityan@datasee.ai'], data)
                 # UserCreated([data['email']])
 
@@ -208,39 +206,57 @@ def get_subuser(request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def reset_token(request):
+@transaction.atomic
+def generate_link(request):
     try:
-        user = User.objects.get(email=request.data['email'])
+        user = User.objects.get(
+            email=request.data['email'], username=request.data['username'])
         if user:
             data = {
-                # "email": user.email,
                 'domain': '127.0.0.1:8000',
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': default_token_generator.make_token(user),
                 'protocol': 'http',
             }
+            # data = {
+            #     'domain': '127.0.0.1:8000',
+            #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            #     'token': default_token_generator.make_token(user),
+            #     'protocol': 'https',
+            # # }
+            PasswordReset.objects.filter(user=user).delete()
+            # PasswordReset.objects.filter(user=user).update(is_active=False)
             PasswordReset.objects.create(user=user, token=data['token'])
-            send_mail("Password Reset Requested", "", 'prathmesh@datasee.ai', [user.email], html_message=render_to_string(
+            sender_email = 'prathmesh@datasee.ai'
+            # sender_email = 'info@datasee.ai'
+            send_mail("Password Reset Requested", "", sender_email, [user.email], html_message=render_to_string(
                 "password_reset_email.html", data), fail_silently=False)
 
-        return Response({"message": "Token generated"}, status=HTTP_200_OK)
+        return Response({"message": "Token Link Generated"}, status=HTTP_200_OK)
     except User.DoesNotExist:
         return Response({"message": "User Not Found"}, status=HTTP_404_NOT_FOUND)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def test_token(request):
-    uid, token = request.data['uid'], request.data['token']
-    if uid != "" and token != "":
+@transaction.atomic
+def reset_password(request):
+    uid, token, password = request.data['uid'], request.data['token'], request.data['password']
+    if uid != "" and token != "" and password != "":
         try:
             user = User.objects.get(id=int(urlsafe_base64_decode(uid)))
-            reset_pass = PasswordReset.objects.get(user=user)
-            serialize_data = PasswordResetSerializers(reset_pass).data
-            return Response({"message": "Active Link"}, status=HTTP_200_OK)
+            token = PasswordReset.objects.filter(
+                user=user, token=token, is_active=True).update(is_active=False)
+            if token != 0:
+                user.set_password(request.data['password'])
+                user.save()
+            else:
+                return Response({"message": "Token Not Exist"}, status=HTTP_404_NOT_FOUND)
+            return Response({"message": "Password Updated Successfully"}, status=HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": "User Not Found"}, status=HTTP_404_NOT_FOUND)
-            # return Response({"message": "Link Expire"}, status=HTTP_404_NOT_FOUND)
+        except ValueError:
+            return Response({"message": "Invalid Data"}, status=HTTP_404_NOT_FOUND)
     else:
-        return Response({"message": "User id or token not available"}, status=HTTP_404_NOT_FOUND)
+        return Response({"message": "User id or token or password not available"}, status=HTTP_404_NOT_FOUND)

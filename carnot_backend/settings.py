@@ -1,5 +1,4 @@
 from os import path
-
 from dj_database_url import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -79,26 +78,25 @@ REST_FRAMEWORK = {
 }
 
 # Database
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'carnot_db',
-        'USER': 'admin',
-        'PASSWORD': 'nA3$N&R822UEY&',
-        'HOST': 'assest.cjhu6qgk6qsr.ap-south-1.rds.amazonaws.com',
-        'PORT': '3306',
-    }
     # 'default': {
     #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'carnot',
-    #     'USER': 'root',
-    #     'PASSWORD': '',
-    #     'HOST': '127.0.0.1',
+    #     'NAME': 'carnot_db',
+    #     'USER': 'admin',
+    #     'PASSWORD': 'nA3$N&R822UEY&',
+    #     'HOST': 'assest.cjhu6qgk6qsr.ap-south-1.rds.amazonaws.com',
     #     'PORT': '3306',
     # }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'carnot',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
 }
-# DATABASES['default'].update(config(conn_max_age=500))
+DATABASES['default'].update(config(conn_max_age=500))
 
 # Password validation
 
@@ -118,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -133,7 +130,6 @@ USE_TZ = True
 # DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = 'static/'
 STATIC_ROOT = path.join(BASE_DIR, 'static')
@@ -141,8 +137,7 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-
-# smtp configuration
+# SMTP configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

@@ -1,7 +1,6 @@
 from django.urls import path
 from . import views
 
-
 urlpatterns = [
     path('save_aoi/', views.save_aoi, name="save_aoi"),
     path('measure/<slug:proj_name>/<slug:date>',

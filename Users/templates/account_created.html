@@ -28,20 +28,26 @@
         font-size: 22px;
         padding: 15px;
         font-weight: 600;
+        text-decoration: none;
+        color: black;
       }
     </style>
   </head>
   <body>
-    <h1 class="box">Datasee.Ai</h1>
-    <h2 class="thanks">Congrats!</h2>
-    <h3 class="thanks">New Account Created.</h3>
-    <h4 class="thanks">Firstname : {{first_name}}</h4>
-    <h4 class="thanks">Lastname : {{last_name}}</h4>
-    <h4 class="thanks">Company : {{company}}</h4>
-    <h4 class="thanks">Phone : {{mobile_number}}</h4>
-    <h4 class="thanks">Email : {{email}}</h4>
-    <div style="text-align: center">
-      <button class="btn">Login to Portal</button>
+    <div>
+      <img class="box" src="/static/logo.png" alt="Datasee.Ai" />
+      <h2 class="thanks">Congrats!</h2>
+      <h3 class="thanks">New Account Created.</h3>
+      <h4 class="thanks">Firstname : {{first_name}}</h4>
+      <h4 class="thanks">Lastname : {{last_name}}</h4>
+      <h4 class="thanks">Company : {{company}}</h4>
+      <h4 class="thanks">Phone : {{mobile_number}}</h4>
+      <h4 class="thanks">Email : {{email}}</h4>
+    </div>
+    <div style="text-align: center; padding: 25px">
+      <a class="btn" href="https://asset.datasee.ai/carnot/landing"
+        >Login to Portal</a
+      >
     </div>
   </body>
 </html>
