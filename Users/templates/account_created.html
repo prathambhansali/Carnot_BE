@@ -1,51 +1,61 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: rgb(236, 234, 234);
-        padding: 0px 15%;
-      }
-      .box {
-        background-color: lightblue;
-        font-weight: 700;
-        text-transform: uppercase;
-        padding: 10px;
-        text-align: center;
-      }
-      .thanks {
-        margin-top: 10px;
-        text-align: center;
-      }
-      .video {
-        text-align: center;
-      }
-      .btn {
-        background-color: rgb(85, 177, 231);
-        border: 0;
-        border-radius: 20%;
-        font-size: 22px;
-        padding: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        color: black;
-      }
-    </style>
-  </head>
-  <body>
+  <head> </head>
+  <body
+    style="
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: lightblue;
+      padding: 0px 15%;
+    "
+  >
     <div>
-      <img class="box" src="/static/logo.png" alt="Datasee.Ai" />
-      <h2 class="thanks">Congrats!</h2>
-      <h3 class="thanks">New Account Created.</h3>
-      <h4 class="thanks">Firstname : {{first_name}}</h4>
-      <h4 class="thanks">Lastname : {{last_name}}</h4>
-      <h4 class="thanks">Company : {{company}}</h4>
-      <h4 class="thanks">Phone : {{mobile_number}}</h4>
-      <h4 class="thanks">Email : {{email}}</h4>
+      <div
+        style="
+          width: auto;
+          padding: 5px;
+          background-color: white;
+          text-align: center;
+        "
+      >
+        <img
+          style="width: 40%; height: auto; border-radius: 10%"
+          src="https://datasee-ai-public-assets.s3.ap-south-1.amazonaws.com/carnot/logo/logo.png"
+          alt="Datasee.Ai"
+        />
+      </div>
+      <div style="padding: 15px">
+        <h1 style="margin-top: 10px; text-align: center">Congrats!</h1>
+        <h2 style="margin-top: 10px; text-align: center">
+          New Account Created.
+        </h2>
+        <h3 style="margin-top: 10px; text-align: center">
+          Firstname : {{first_name}}
+        </h3>
+        <h3 style="margin-top: 10px; text-align: center">
+          Lastname : {{last_name}}
+        </h3>
+        <h3 style="margin-top: 10px; text-align: center">
+          Company : {{company}}
+        </h3>
+        <h3 style="margin-top: 10px; text-align: center">
+          Phone : {{mobile_number}}
+        </h3>
+        <h3 style="margin-top: 10px; text-align: center">Email : {{email}}</h3>
+      </div>
     </div>
-    <div style="text-align: center; padding: 25px">
-      <a class="btn" href="https://asset.datasee.ai/carnot/landing"
+    <div style="text-align: center">
+      <a
+        style="
+          background-color: rgb(23 117 173);
+          border: 0;
+          border-radius: 30%;
+          font-size: 20px;
+          padding: 15px;
+          font-weight: 600;
+          text-decoration: none;
+          color: white;
+        "
+        href="https://asset.datasee.ai/carnot/landing"
         >Login to Portal</a
       >
     </div>

@@ -1,7 +1,5 @@
 from django.urls import path
-from carnot_backend import settings
 from . import views
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('login/', views.home, name="login"),
@@ -11,4 +9,5 @@ urlpatterns = [
     path('update_profile/', views.update_profile, name="update_profile"),
     path('generate_link/', views.generate_link, name="generate_link"),
     path('reset_password/', views.reset_password, name="reset_password"),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('verify_email/', views.verify_email, name="verify_email"),
+]

@@ -6,19 +6,21 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from project_module.models import Project
-from rest_framework.authentication import (TokenAuthentication, authenticate,
-                                           get_user_model)
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import (api_view, authentication_classes,
-                                       permission_classes)
-from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from .models import PasswordReset, UserProfile
 from django.db import transaction
+from rest_framework.response import Response
+from rest_framework.authentication import (TokenAuthentication, authenticate,
+                                           get_user_model)
+from rest_framework.decorators import (api_view, authentication_classes,
+                                       permission_classes)
+from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
+
+
 
 def UserCreated(mail_list):
-    # sender_email = 'prathmesh@datasee.ai'
-    sender_email = 'info@datasee.ai'
+    sender_email = 'prathmesh@datasee.ai'
+    # sender_email = 'info@datasee.ai'
     subject = 'Account Created'
 
     send_mail(subject, "", sender_email, mail_list,
@@ -27,8 +29,8 @@ def UserCreated(mail_list):
 
 
 def AccountCreated(mail_list, data):
-    # sender_email = 'prathmesh@datasee.ai'
-    sender_email = 'info@datasee.ai'
+    sender_email = 'prathmesh@datasee.ai'
+    # sender_email = 'info@datasee.ai'
 
     html_message = render_to_string('account_created.html', {
         'first_name': data['first_name'],
@@ -212,18 +214,19 @@ def generate_link(request):
         user = User.objects.get(
             email=request.data['email'], username=request.data['username'])
         if user:
-            data = {
-                'domain': '127.0.0.1:8000',
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-                'protocol': 'http',
-            }
             # data = {
-            #     'domain': '127.0.0.1:8000',
+            #     'domain': '127.0.0.1:8000/carnot/auth/recovery',
             #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             #     'token': default_token_generator.make_token(user),
-            #     'protocol': 'https',
-            # # }
+            #     'protocol': 'http',
+            # }
+            data = {
+                # 'domain': 'asset.datasee.ai/carnot/auth/recovery',
+                'domain': 'carnot-app.herokuapp.com/carnot/auth/recovery',
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+                'protocol': 'https',
+            }
             PasswordReset.objects.filter(user=user).delete()
             # PasswordReset.objects.filter(user=user).update(is_active=False)
             PasswordReset.objects.create(user=user, token=data['token'])
@@ -260,3 +263,20 @@ def reset_password(request):
             return Response({"message": "Invalid Data"}, status=HTTP_404_NOT_FOUND)
     else:
         return Response({"message": "User id or token or password not available"}, status=HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([])
+def verify_email(request):
+    email = request.data['email']
+    if email != "":
+        try:
+            if User.objects.get(email=email): 
+                return Response({"message": False}, status=HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message": True}, status=HTTP_200_OK)
+        except Exception:
+            return Response({"message": "Something Went Wrong"}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        return Response({"message": "Invalid Data"}, status=HTTP_404_NOT_FOUND)
