@@ -14,8 +14,7 @@ from rest_framework.authentication import (TokenAuthentication, authenticate,
                                            get_user_model)
 from rest_framework.decorators import (api_view, authentication_classes,
                                        permission_classes)
-from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
-
+from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def UserCreated(mail_list):
@@ -210,34 +209,37 @@ def get_subuser(request):
 @permission_classes([])
 @transaction.atomic
 def generate_link(request):
-    try:
-        user = User.objects.get(
-            email=request.data['email'], username=request.data['username'])
-        if user:
-            # data = {
-            #     'domain': '127.0.0.1:8000/carnot/auth/recovery',
-            #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            #     'token': default_token_generator.make_token(user),
-            #     'protocol': 'http',
-            # }
-            data = {
-                # 'domain': 'asset.datasee.ai/carnot/auth/recovery',
-                'domain': 'carnot-app.herokuapp.com/carnot/auth/recovery',
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-                'protocol': 'https',
-            }
-            PasswordReset.objects.filter(user=user).delete()
-            # PasswordReset.objects.filter(user=user).update(is_active=False)
-            PasswordReset.objects.create(user=user, token=data['token'])
-            sender_email = 'prathmesh@datasee.ai'
-            # sender_email = 'info@datasee.ai'
-            send_mail("Password Reset Requested", "", sender_email, [user.email], html_message=render_to_string(
-                "password_reset_email.html", data), fail_silently=False)
+    email = request.data['email']
+    if email != "":
+        try:
+            user = User.objects.get(email=email)
+            if user:
+                # data = {
+                #     'domain': '127.0.0.1:8000/carnot/auth/recovery',
+                #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                #     'token': default_token_generator.make_token(user),
+                #     'protocol': 'http',
+                # }
+                data = {
+                    # 'domain': 'asset.datasee.ai/carnot/auth/recovery',
+                    'domain': 'carnot-app.herokuapp.com/carnot/auth/recovery',
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                    'protocol': 'https',
+                }
+                PasswordReset.objects.filter(user=user).delete()
+                # PasswordReset.objects.filter(user=user).update(is_active=False)
+                PasswordReset.objects.create(user=user, token=data['token'])
+                sender_email = 'prathmesh@datasee.ai'
+                # sender_email = 'info@datasee.ai'
+                send_mail("Password Reset Requested", "", sender_email, [user.email], html_message=render_to_string(
+                    "password_reset_email.html", data), fail_silently=False)
 
-        return Response({"message": "Token Link Generated"}, status=HTTP_200_OK)
-    except User.DoesNotExist:
-        return Response({"message": "User Not Found"}, status=HTTP_404_NOT_FOUND)
+            return Response({"message": "Token Link Generated"}, status=HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message": "User Not Found"}, status=HTTP_404_NOT_FOUND)
+    else:
+        return Response({"message": "Data Invalid"}, status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -260,7 +262,7 @@ def reset_password(request):
         except User.DoesNotExist:
             return Response({"message": "User Not Found"}, status=HTTP_404_NOT_FOUND)
         except ValueError:
-            return Response({"message": "Invalid Data"}, status=HTTP_404_NOT_FOUND)
+            return Response({"message": "Data Invalid"}, status=HTTP_400_BAD_REQUEST)
     else:
         return Response({"message": "User id or token or password not available"}, status=HTTP_404_NOT_FOUND)
 
@@ -272,7 +274,7 @@ def verify_email(request):
     email = request.data['email']
     if email != "":
         try:
-            if User.objects.get(email=email): 
+            if User.objects.get(email=email):
                 return Response({"message": False}, status=HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": True}, status=HTTP_200_OK)
