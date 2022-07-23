@@ -26,7 +26,7 @@ class UserProfile(models.Model):
 
 class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=32, blank=True, null=True)
+    token = models.CharField(max_length=255, blank=True, null=True)
     created_on = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
 
